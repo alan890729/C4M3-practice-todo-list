@@ -1,0 +1,23 @@
+{
+  "name": "c4m1-practice-todo-list",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "a todo-list(practice)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "express",
+    "server",
+    "CRUD",
+    "todo-list",
+    "RESTful"
+  ],
+  "author": "Alan Huang",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
