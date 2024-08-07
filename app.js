@@ -1,17 +1,20 @@
-import express from 'express'
-
+const express = require('express')
 const app = express()
 const port = 3000
+
+const db = require('./models')
+const Todo = db.Todo
 
 app.get('/', (req, res) => {
     res.redirect('/todos')
 })
 
 app.get('/todos', (req, res) => {
-    res.send(`
-        <p>GET /todos</p>
-        <p>You can see all todos here.</p>
-    `)
+    return Todo.findAll().then((todos) => {
+        res.send({ todos })
+    }).catch((err) => {
+        res.status(422).json(err)
+    })
 })
 
 app.get('/todos/new', (req, res) => {
@@ -60,6 +63,6 @@ app.delete('/todos/:id', (req, res) => {
     `)
 })
 
-app.listen(port, () => { 
+app.listen(port, () => {
     console.log(`express server running on http://localhost:${port}`)
 })

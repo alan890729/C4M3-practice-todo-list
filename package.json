@@ -1,6 +1,6 @@
 {
   "name": "c4m1-practice-todo-list",
-  "type": "module",
+  "type": "commonjs",
   "version": "1.0.0",
   "description": "a todo-list(practice)",
   "main": "app.js",
@@ -18,6 +18,9 @@
   "author": "Alan Huang",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.3",
+    "sequelize-cli": "^6.6.2"
   }
 }
