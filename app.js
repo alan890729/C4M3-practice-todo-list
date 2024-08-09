@@ -10,6 +10,8 @@ app.engine('.hbs', engine({ extname: '.hbs' }))
 app.set('view engine', '.hbs')
 app.set('views', './views')
 
+app.use(express.urlencoded({ extended: true }))
+
 app.get('/', (req, res) => {
     res.render('index')
 })
@@ -29,17 +31,17 @@ app.get('/todos', (req, res) => {
 })
 
 app.get('/todos/new', (req, res) => {
-    res.send(`
-        <p>GET /todos/new</p>
-        <p>You can add new todo here. This is a page for adding todos. Enter some todo details and press 'Create' to create a todo.</p>
-    `)
+    res.render('new')
 })
 
 app.post('/todos', (req, res) => {
-    res.send(`
-        <p>POST /todos</p>
-        <p>Successfully add a todo.</p>    
-    `)
+    const { name } = req.body
+
+    return Todo.create({ name }).then(() => {
+        res.redirect('/todos')
+    }).catch((err) => {
+        res.status(422).json(err)
+    })
 })
 
 app.get('/todos/:id', (req, res) => {
