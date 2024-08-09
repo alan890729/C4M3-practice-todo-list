@@ -4,6 +4,8 @@
     {{#each todos as |todo|}}
     <li>
         {{todo.name}}
+        <a href="/todos/{{todo.id}}">detail</a>
     </li>
+    
     {{/each}}
 </ul>

@@ -46,10 +46,18 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos/:id', (req, res) => {
     const todoId = req.params.id
-    res.send(`
-        <p>GET /todos/${todoId}</p>
-        <p>A specific todo in todos, this is todo id: ${todoId}</p>    
-    `)
+
+    return Todo.findByPk(todoId, {
+        attributes: [
+            'id',
+            'name'
+        ],
+        raw: true
+    }).then((todo) => {
+        res.render('todo', { todo })
+    }).catch((err) => {
+        res.status(422).json(err)
+    })
 })
 
 app.get('/todos/:id/edit', (req, res) => {
