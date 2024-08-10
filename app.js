@@ -96,10 +96,16 @@ app.put('/todos/:id', (req, res) => {
 
 app.delete('/todos/:id', (req, res) => {
     const todoId = req.params.id
-    res.send(`
-        <p>DELETE /todos/${todoId}</p>   
-        <p>todo id: ${todoId} has been deleted</p> 
-    `)
+
+    return Todo.destroy({
+        where: {
+            id: Number(todoId)
+        }
+    }).then(() => {
+        res.redirect('/todos')
+    }).catch((err) => {
+        res.status(422).json(err)
+    })
 })
 
 app.listen(port, () => {
