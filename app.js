@@ -22,7 +22,8 @@ app.get('/todos', (req, res) => {
     return Todo.findAll({
         attributes: [
             'id',
-            'name'
+            'name',
+            'isCompleted'
         ],
         raw: true
     }).then((todos) => {
@@ -52,7 +53,8 @@ app.get('/todos/:id', (req, res) => {
     return Todo.findByPk(todoId, {
         attributes: [
             'id',
-            'name'
+            'name',
+            'isCompleted'
         ],
         raw: true
     }).then((todo) => {
@@ -68,7 +70,8 @@ app.get('/todos/:id/edit', (req, res) => {
     return Todo.findByPk(todoId, {
         attributes: [
             'id',
-            'name'
+            'name',
+            'isCompleted'
         ],
         raw: true
     }).then((todo) => {
@@ -80,10 +83,10 @@ app.get('/todos/:id/edit', (req, res) => {
 
 app.put('/todos/:id', (req, res) => {
     const todoId = req.params.id
-    const { name } = req.body
+    const { name, isCompleted } = req.body
 
     return Todo.update(
-        { name },
+        { name, isCompleted: isCompleted === 'on'},
         {
             where: { id: Number(todoId) }
         }
