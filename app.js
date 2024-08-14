@@ -2,6 +2,8 @@ const express = require('express')
 const db = require('./models')
 const { engine } = require('express-handlebars')
 const methodOverride = require('method-override')
+const session = require('express-session')
+const flash = require('connect-flash')
 
 const app = express()
 const port = 3000
@@ -13,9 +15,15 @@ app.set('views', './views')
 
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
+app.use(session({
+    secret: 'MySecret',
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(flash())
 
 app.get('/', (req, res) => {
-    res.render('index')
+    res.redirect('/todos')
 })
 
 app.get('/todos', (req, res) => {
@@ -27,7 +35,10 @@ app.get('/todos', (req, res) => {
         ],
         raw: true
     }).then((todos) => {
-        res.render('todos', { todos })
+        res.render('todos', {
+            todos,
+            message: req.flash('success')
+        })
     }).catch((err) => {
         res.status(422).json(err)
     })
@@ -41,6 +52,7 @@ app.post('/todos', (req, res) => {
     const { name } = req.body
 
     return Todo.create({ name }).then(() => {
+        req.flash('success', '新增成功!')
         res.redirect('/todos')
     }).catch((err) => {
         res.status(422).json(err)
@@ -58,7 +70,7 @@ app.get('/todos/:id', (req, res) => {
         ],
         raw: true
     }).then((todo) => {
-        res.render('todo', { todo })
+        res.render('todo', { todo, message: req.flash('success') })
     }).catch((err) => {
         res.status(422).json(err)
     })
@@ -91,6 +103,7 @@ app.put('/todos/:id', (req, res) => {
             where: { id: Number(todoId) }
         }
     ).then(() => {
+        req.flash('success', '編輯成功!')
         res.redirect(`/todos/${todoId}`)
     }).catch((err) => {
         res.status(422).json(err)
@@ -105,6 +118,7 @@ app.delete('/todos/:id', (req, res) => {
             id: Number(todoId)
         }
     }).then(() => {
+        req.flash('success', '刪除成功!')
         res.redirect('/todos')
     }).catch((err) => {
         res.status(422).json(err)

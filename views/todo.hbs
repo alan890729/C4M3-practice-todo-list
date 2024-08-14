@@ -1,3 +1,8 @@
+{{#if message}}
+<div>
+    {{message}}
+</div>
+{{/if}}
 <div>
     <input type="checkbox" id="todo-{{todo.id}}" {{#if todo.isCompleted}} checked {{/if}} disabled>
     <label for="todo-{{todo.id}}">{{todo.name}}</lebel>
