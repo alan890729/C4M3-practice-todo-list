@@ -1,3 +1,9 @@
+{{#if error}}
+<div>
+    {{error}}
+</div>
+{{/if}}
+
 <form action="/todos/{{todo.id}}?_method=PUT" method="post">
     <input type="checkbox" name="isCompleted" {{#if todo.isCompleted}} checked {{/if}}>
     <input type="text" placeholder="Enter a todo......" name="name" value="{{todo.name}}">
