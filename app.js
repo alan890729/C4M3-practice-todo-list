@@ -4,6 +4,8 @@ const methodOverride = require('method-override')
 const session = require('express-session')
 const flash = require('connect-flash')
 const router = require('./routes')
+const messageHandler = require('./middlewares/message-handler')
+const errorHandler = require('./middlewares/error-handler')
 
 const app = express()
 const port = 3000
@@ -20,7 +22,9 @@ app.use(session({
     saveUninitialized: false
 }))
 app.use(flash())
+app.use(messageHandler)
 app.use(router)
+app.use(errorHandler)
 
 app.listen(port, () => {
     console.log(`express server running on http://localhost:${port}`)
