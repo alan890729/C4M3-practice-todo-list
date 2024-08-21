@@ -5,13 +5,27 @@ const router = express.Router()
 const Todo = db.Todo
 
 router.get('/', (req, res, next) => {
-    return Todo.findAll({
-        attributes: [
-            'id',
-            'name',
-            'isCompleted'
-        ],
-        raw: true
+    const currentPage = Number(req.query.page) || 1
+    const limit = 10
+
+    return Todo.count().then((amount) => {
+
+        const totalPage = amount % limit ? Math.ceil(amount / limit) : amount / limit
+        res.locals.currentPage = currentPage
+        res.locals.totalPage = totalPage
+        res.locals.prevPage = currentPage - 1 ? currentPage - 1 : currentPage
+        res.locals.nextPage = currentPage === totalPage ? currentPage : currentPage + 1
+    }).then(() => {
+        return Todo.findAll({
+            attributes: [
+                'id',
+                'name',
+                'isCompleted'
+            ],
+            limit,
+            offset: (currentPage - 1) * 10,
+            raw: true
+        })
     }).then((todos) => {
         return res.render('todos', { todos })
     }).catch((err) => {

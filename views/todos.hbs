@@ -13,3 +13,40 @@
     </form>
 </div>
 {{/each}}
+
+<div style="display: flex; margin-top: 0.5rem;">
+
+    <div style="margin-right: 0.5rem;">
+        <form action="/todos" method="get">
+            <input type="hidden" name="page" value="{{prevPage}}">
+            <button type="submit">prev</button>
+        </form>
+    </div>
+
+    <div style="margin-right: 0.5rem;">
+        <form action="/todos" method="get">
+            <input type="hidden" name="page" value="{{nextPage}}">
+            <button type="submit">next</button>
+        </form>
+    </div>
+
+    <div style="margin-right: 0.5rem;">
+
+        <div style="display: flex;">
+
+            <div style="margin-right: 0.5rem;">
+                <form action="/todos" method="get" class="margin-right: 0.5rem;">
+                    <input type="number" name="page" value="{{currentPage}}" min="1" max="{{totalPage}}"
+                        style="width: 3rem">
+                </form>
+            </div>
+
+            <span style="margin-right: 0.5rem;"> / </span>
+            <span style="margin-right: 0.5rem;">{{totalPage}}</span>
+
+        </div>
+
+
+    </div>
+
+</div>
