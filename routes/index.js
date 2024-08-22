@@ -5,6 +5,7 @@ const LocalStrategy = require('passport-local')
 const router = express.Router()
 const todosRouter = require('./todos')
 const userRouter = require('./users')
+const authHandler = require('../middlewares/auth-handler')
 const db = require('../models')
 const User = db.User
 
@@ -33,7 +34,11 @@ passport.serializeUser((user, done) => {
     return done(null, { id, name, email })
 })
 
-router.use('/todos', todosRouter)
+passport.deserializeUser((user, done) => {
+    return done(null, { id: user.id })
+})
+
+router.use('/todos', authHandler, todosRouter)
 router.use('/users', userRouter)
 
 router.get('/', (req, res) => {
@@ -50,8 +55,14 @@ router.post('/login', passport.authenticate('local', {
     failureFlash: true
 }))
 
-router.post('/logout', (req, res) => {
-    return res.send('on route: POST /users/logout, user logging out')
+router.post('/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err)
+        }
+
+        return res.redirect('/login')
+    })
 })
 
 router.get('/register', (req, res) => {
