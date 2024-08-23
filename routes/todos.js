@@ -7,6 +7,7 @@ const Todo = db.Todo
 router.get('/', (req, res, next) => {
     const currentPage = Number(req.query.page) || 1
     const limit = 10
+    const userId = req.user.id
 
     return Todo.count().then((amount) => {
 
@@ -22,6 +23,7 @@ router.get('/', (req, res, next) => {
                 'name',
                 'isCompleted'
             ],
+            where: { userId },
             limit,
             offset: (currentPage - 1) * 10,
             raw: true
@@ -40,8 +42,12 @@ router.get('/new', (req, res) => {
 
 router.post('/', (req, res, next) => {
     const { name } = req.body
+    const userId = req.user.id
 
-    return Todo.create({ name }).then(() => {
+    return Todo.create({
+        name,
+        userId
+    }).then(() => {
         req.flash('success', '新增成功!')
         return res.redirect('/todos')
     }).catch((err) => {
@@ -52,15 +58,27 @@ router.post('/', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
     const todoId = req.params.id
+    const userId = req.user.id
 
     return Todo.findByPk(todoId, {
         attributes: [
             'id',
             'name',
-            'isCompleted'
+            'isCompleted',
+            'userId'
         ],
         raw: true
     }).then((todo) => {
+        if (!todo) {
+            req.flash('error', '找不到資料')
+            return res.redirect('/todos')
+        }
+
+        if (todo.userId !== userId) {
+            req.flash('error', '沒有權限')
+            return res.redirect('/todos')
+        }
+
         return res.render('todo', { todo })
     }).catch((err) => {
         err.errorMessage = '取得資料失敗!!'
@@ -71,15 +89,27 @@ router.get('/:id', (req, res, next) => {
 
 router.get('/:id/edit', (req, res, next) => {
     const todoId = req.params.id
+    const userId = req.user.id
 
     return Todo.findByPk(todoId, {
         attributes: [
             'id',
             'name',
-            'isCompleted'
+            'isCompleted',
+            'userId'
         ],
         raw: true
     }).then((todo) => {
+        if (!todo) {
+            req.flash('error', '找不到資料')
+            return res.redirect('/todos')
+        }
+
+        if (todo.userId !== userId) {
+            req.flash('error', '沒有權限')
+            return res.redirect('/todos')
+        }
+
         return res.render('edit', { todo })
     }).catch((err) => {
         err.errorMessage = '取得編輯頁失敗!!'
@@ -90,13 +120,33 @@ router.get('/:id/edit', (req, res, next) => {
 router.put('/:id', (req, res, next) => {
     const todoId = req.params.id
     const { name, isCompleted } = req.body
+    const userId = req.user.id
 
-    return Todo.update(
-        { name, isCompleted: isCompleted === 'on' },
-        {
-            where: { id: Number(todoId) }
+    return Todo.findByPk(todoId, {
+        attributes: [
+            'id',
+            'name',
+            'isCompleted',
+            'userId'
+        ]
+    }).then((todo) => {
+        if (!todo) {
+            req.flash('error', '找不到資料')
+            return res.redirect('/todos')
         }
-    ).then(() => {
+
+        if (todo.userId !== userId) {
+            req.flash('error', '沒有權限')
+            return res.redirect('/todos')
+        }
+
+        return todo.update(
+            {
+                name,
+                isCompleted: isCompleted === 'on'
+            }
+        )
+    }).then(() => {
         req.flash('success', '編輯成功!')
         return res.redirect(`/todos/${todoId}`)
     }).catch((err) => {
@@ -107,11 +157,22 @@ router.put('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
     const todoId = req.params.id
+    const userId = req.user.id
 
-    return Todo.destroy({
-        where: {
-            id: Number(todoId)
+    return Todo.findByPk(todoId, {
+        attributes: ['id', 'userId']
+    }).then((todo) => {
+        if (!todo) {
+            req.flash('error', '找不到資料')
+            return res.redirect('/todos')
         }
+
+        if (todo.userId !== userId) {
+            req.flash('error', '沒有權限')
+            return res.redirect('/todos')
+        }
+
+        return todo.destroy()
     }).then(() => {
         req.flash('success', '刪除成功!')
         return res.redirect('/todos')
