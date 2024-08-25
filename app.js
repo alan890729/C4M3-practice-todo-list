@@ -4,13 +4,13 @@ const methodOverride = require('method-override')
 const session = require('express-session')
 const flash = require('connect-flash')
 const passport = require('passport')
+if (process.env.NODE_ENV === 'development') {
+    require('dotenv').config()
+} // 我之後先試著require引入順序是:npm下載的 - 相對路徑（./......）
+
 const router = require('./routes')
 const messageHandler = require('./middlewares/message-handler')
 const errorHandler = require('./middlewares/error-handler')
-
-if (process.env.NODE_ENV === 'development') {
-    require('dotenv').config()
-}
 
 const app = express()
 const port = 3000
