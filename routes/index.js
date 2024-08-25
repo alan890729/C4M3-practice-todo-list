@@ -1,6 +1,7 @@
 const express = require('express')
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
+const bcrypt = require('bcryptjs')
 
 const router = express.Router()
 const todosRouter = require('./todos')
@@ -18,11 +19,17 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (username, password, 
         },
         raw: true
     }).then((user) => {
-        if (!user || user.password !== password) {
+        if (!user) {
             return done(null, false, { type: 'error', message: 'email 或 password 錯誤' })
         }
 
-        return done(null, user)
+        return bcrypt.compare(password, user.password).then((isMatched) => {
+            if (!isMatched) {
+                return done(null, false, { type: 'error', message: 'email 或 password 錯誤' })
+            }
+
+            return done(null, user)
+        })
     }).catch((err) => {
         err.errorMessage = '登入失敗'
         done(err)
